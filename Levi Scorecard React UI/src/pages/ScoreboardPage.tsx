@@ -1,8 +1,12 @@
+import { useEffect, useRef, useState } from 'react';
 import {
+  ArrowDown,
+  ArrowUp,
   BellRing,
   Crown,
   Gauge,
   Megaphone,
+  Minus,
   Trophy,
   X,
   Zap,
@@ -14,7 +18,6 @@ import { TopBar } from '@/components/layout/TopBar';
 import { ScoreboardHeader } from '@/components/scoreboard/ScoreboardHeader';
 import { MetricCard } from '@/components/scoreboard/MetricCard';
 import { EmployeeRow } from '@/components/scoreboard/EmployeeRow';
-import { TeamRow } from '@/components/scoreboard/TeamRow';
 import { ActivityRow } from '@/components/scoreboard/ActivityRow';
 import { TransferCelebration } from '@/components/scoreboard/TransferCelebration';
 import { DayResultsCelebration } from '@/components/scoreboard/DayResultsCelebration';
@@ -23,6 +26,52 @@ export function ScoreboardPage() {
   const navigate = useNavigate();
   const scoreboard = useScoreboardContext();
   
+  const [employeeMovements, setEmployeeMovements] = useState<
+  Record<string, 'up' | 'down' | 'same'>
+>({});
+
+const previousRanks = useRef<Record<string, number> | null>(null);
+
+useEffect(() => {
+  const currentRanks: Record<string, number> = {};
+
+  scoreboard.rankedEmployees.forEach((employee, index) => {
+    currentRanks[employee.id] = index;
+  });
+
+  // First load: save ranks without showing movement arrows.
+  if (previousRanks.current === null) {
+    previousRanks.current = currentRanks;
+    return;
+  }
+
+  const oldRanks = previousRanks.current;
+
+  setEmployeeMovements((previousMovements) => {
+    const nextMovements = { ...previousMovements };
+
+    scoreboard.rankedEmployees.forEach((employee, index) => {
+      const previousRank = oldRanks[employee.id];
+
+      // Ignore newly appearing employees.
+      if (previousRank === undefined) {
+        return;
+      }
+
+      // Update the arrow only when the rank changes.
+      if (previousRank > index) {
+        nextMovements[employee.id] = 'up';
+      } else if (previousRank < index) {
+        nextMovements[employee.id] = 'down';
+      }
+      // If the rank is unchanged, keep the previous arrow.
+    });
+
+    return nextMovements;
+  });
+
+  previousRanks.current = currentRanks;
+}, [scoreboard.rankedEmployees]);
 
   return (
     <div className="app-shell scoreboard-mode">
@@ -95,100 +144,121 @@ export function ScoreboardPage() {
         </section>
 
         <section className="board-layout">
-          <div className="rankings-card panel-card">
-            <div className="section-heading">
+  <div className="teams-board">
+    {scoreboard.rankedTeams.map((team, teamIndex) => {
+      const teamEmployees = scoreboard.employees
+  .filter((employee) => employee.teamId === team.id)
+  .sort(
+    (a, b) =>
+      b.transfers - a.transfers ||
+      a.name.localeCompare(b.name)
+  );
+
+      return (
+        <div
+          key={team.id}
+          className={`team-employee-card ${
+            teamIndex === 0 ? 'team-card-leader' : ''
+          }`}
+        >
+          <div className="team-board-header">
+            <div className="team-board-title">
+              <div
+                className="team-board-avatar"
+                style={{ background: team.color }}
+              >
+                {team.short}
+              </div>
+
               <div>
-                <span className="section-kicker">INDIVIDUAL RANKINGS</span>
-                <h2>Top performers</h2>
+                <div className="team-board-rank">
+                  #{teamIndex + 1} TEAM
+                </div>
+
+                <h2>
+                  {team.name}
+                </h2>
               </div>
-
-              {scoreboard.dayStarted ? (
-                <span className="live-mini">
-                  <span className="live-dot" /> Updating live
-                </span>
-              ) : (
-                <span className="offline-mini">
-                  <span className="offline-dot" /> Offline
-                </span>
-              )}
             </div>
 
-            <div className="compact-leader">
-              <Crown size={15} />
-              <span>LEADER</span>
-              <strong>
-                {scoreboard.leader?.name ?? 'Waiting for a leader'}
-              </strong>
-              <b>{scoreboard.leader?.transfers ?? 0} transfers</b>
-            </div>
-
-            <div className="employee-list">
-              {scoreboard.rankedEmployees.map((employee, index) => (
-                <EmployeeRow
-                  key={employee.id}
-                  employee={employee}
-                  index={index}
-                  team={scoreboard.teams.find(
-                    (team) => team.id === employee.teamId,
-                  )}
-                  isLeader={index === 0}
-                  flash={scoreboard.flashId === employee.id}
-                />
-              ))}
+            <div className="team-board-score">
+              <strong>{team.score}</strong>
+              <span>transfers</span>
             </div>
           </div>
 
-          <div className="side-stack">
-            <div className="panel-card team-card">
-              <div className="section-heading">
-                <div>
-                  <span className="section-kicker">TEAM RANKINGS</span>
-                  <h2>Race to the top</h2>
-                </div>
-
-                <Trophy size={20} className="heading-icon" />
-              </div>
-
-              <div className="team-list">
-                {scoreboard.rankedTeams.map((team, index) => (
-                  <TeamRow
-                    key={team.id}
-                    team={team}
-                    index={index}
-                    total={scoreboard.total}
-                    isLeader={index === 0}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="panel-card activity-card">
-              <div className="section-heading">
-                <div>
-                  <span className="section-kicker">LIVE ACTIVITY</span>
-                  <h2>In the moment</h2>
-                </div>
-
-                <BellRing size={18} className="heading-icon" />
-              </div>
-
-              <div className="activity-list">
-                {scoreboard.activities.length ? (
-                  scoreboard.activities.map((activity) => (
-                    <ActivityRow
-                      key={activity.id}
-                      activity={activity}
-                    />
-                  ))
-                ) : (
-                  <p className="empty-copy">
-                    Transfers will appear here as they happen.
-                  </p>
-                )}
-              </div>
-            </div>
+          <div className="team-progress">
+            <span
+              style={{
+                width: `${
+                  scoreboard.total
+                    ? Math.max(
+                        (team.score / scoreboard.total) * 100,
+                        4
+                      )
+                    : 4
+                }%`,
+                background: team.color,
+              }}
+            />
           </div>
-        </section>
+
+          <div className="team-employee-header">
+            <span>EMPLOYEE</span>
+            <span>TRANSFERS</span>
+          </div>
+
+          <div className="team-employee-list">
+  {teamEmployees.map((employee, index) => (
+    <EmployeeRow
+      key={employee.id}
+      employee={employee}
+      serialNumber={index + 1}
+      isLeader={scoreboard.leader?.id === employee.id}
+      movement={employeeMovements[employee.id] ?? 'same'}
+      flash={scoreboard.flashId === employee.id}
+    />
+  ))}
+</div>
+        </div>
+      );
+    })}
+  </div>
+
+  <div className="side-stack">
+    <div className="panel-card activity-card">
+      <div className="section-heading">
+        <div>
+          <span className="section-kicker">
+            LIVE ACTIVITY
+          </span>
+
+          <h2>In the moment</h2>
+        </div>
+
+        <BellRing
+          size={18}
+          className="heading-icon"
+        />
+      </div>
+
+      <div className="activity-list">
+        {scoreboard.activities.length ? (
+          scoreboard.activities.map((activity) => (
+            <ActivityRow
+              key={activity.id}
+              activity={activity}
+            />
+          ))
+        ) : (
+          <p className="empty-copy">
+            Transfers will appear here as they happen.
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
 
         {scoreboard.announcement && (
           <div className="announcement">

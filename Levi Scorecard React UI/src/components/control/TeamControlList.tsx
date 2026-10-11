@@ -48,9 +48,9 @@ export function TeamControlList({
           </div>
           <div className="control-employee-list">
             {employees
-              .filter((employee) => employee.teamId === team.id)
-              .sort((a, b) => b.transfers - a.transfers)
-              .map((employee) => (
+  .filter((employee) => employee.teamId === team.id)
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .map((employee) => (
                 <EmployeeControlRow
                   key={employee.id}
                   employee={employee}

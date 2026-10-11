@@ -12,8 +12,8 @@ export function LoginPage() {
   const navigate = useNavigate();
   const scoreboard = useScoreboard();
 
-  const [email, setEmail] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -148,10 +148,6 @@ export function LoginPage() {
               : 'Enter control center'}
           </button>
 
-          <div className="demo-note">
-            <ShieldCheck size={15} /> Demo mode is ready. No account setup
-            required.
-          </div>
         </div>
       </div>
     </div>

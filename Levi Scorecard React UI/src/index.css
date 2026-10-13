@@ -1146,3 +1146,107 @@ button { cursor: pointer; }
   line-height: 1;
   box-sizing: border-box;
 }
+
+
+.board-layout {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.teams-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.team-employee-card {
+  min-width: 0;
+}
+
+.team-employee-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: repeat(10, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: start;
+}
+
+.employee-row {
+  min-width: 0;
+  gap: 5px;
+  padding: 4px 3px;
+}
+
+.employee-name {
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .teams-board {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100%;
+  }
+
+  .team-employee-card {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Stack team containers */
+  .teams-board {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stack employee heading labels */
+  .team-employee-header {
+    display: none;
+  }
+
+  /* Stack each employee row */
+  .team-employee-list .employee-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* One team container per row */
+  .teams-board {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+  }
+
+  /* Prevent team cards from forcing multiple columns */
+  .team-employee-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Keep each employee's details in one horizontal row */
+  .employee-row {
+    display: grid;
+    grid-template-columns: 24px 36px minmax(0, 1fr) 20px 36px !important;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .employee-details {
+    min-width: 0;
+  }
+
+  .employee-name {
+    overflow-wrap: anywhere;
+  }
+}

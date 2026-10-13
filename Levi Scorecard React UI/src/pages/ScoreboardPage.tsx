@@ -18,7 +18,6 @@ import { TopBar } from '@/components/layout/TopBar';
 import { ScoreboardHeader } from '@/components/scoreboard/ScoreboardHeader';
 import { MetricCard } from '@/components/scoreboard/MetricCard';
 import { EmployeeRow } from '@/components/scoreboard/EmployeeRow';
-import { ActivityRow } from '@/components/scoreboard/ActivityRow';
 import { TransferCelebration } from '@/components/scoreboard/TransferCelebration';
 import { DayResultsCelebration } from '@/components/scoreboard/DayResultsCelebration';
 
@@ -225,39 +224,6 @@ useEffect(() => {
     })}
   </div>
 
-  <div className="side-stack">
-    <div className="panel-card activity-card">
-      <div className="section-heading">
-        <div>
-          <span className="section-kicker">
-            LIVE ACTIVITY
-          </span>
-
-          <h2>In the moment</h2>
-        </div>
-
-        <BellRing
-          size={18}
-          className="heading-icon"
-        />
-      </div>
-
-      <div className="activity-list">
-        {scoreboard.activities.length ? (
-          scoreboard.activities.map((activity) => (
-            <ActivityRow
-              key={activity.id}
-              activity={activity}
-            />
-          ))
-        ) : (
-          <p className="empty-copy">
-            Transfers will appear here as they happen.
-          </p>
-        )}
-      </div>
-    </div>
-  </div>
 </section>
 
         {scoreboard.announcement && (
@@ -285,6 +251,7 @@ useEffect(() => {
             key={scoreboard.transferQueue[0].id}
             employeeName={scoreboard.transferQueue[0].employeeName}
             onComplete={scoreboard.completeTransferCelebration}
+            isSoundOn={scoreboard.isSoundOn}
           />
         )}
         

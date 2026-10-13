@@ -243,9 +243,7 @@ const canResumeDay =
               currentCount - previousCount;
 
             if (newTransfers > 0) {
-              if (isSoundOn) {
-                playCelebrationSound();
-              }
+              
               for (
                 let index = 0;
                 index < newTransfers;
@@ -578,101 +576,6 @@ const canResumeDay =
       );
     }, []);
 
-  const playCelebrationSound = async () => {
-  const AudioContextClass =
-    window.AudioContext ||
-    (
-      window as typeof window & {
-        webkitAudioContext?: typeof AudioContext;
-      }
-    ).webkitAudioContext;
-
-  if (!AudioContextClass) {
-    return;
-  }
-
-  const context = new AudioContextClass();
-
-  try {
-    if (context.state === 'suspended') {
-      await context.resume();
-    }
-
-    const now = context.currentTime;
-
-    const playNote = (
-      frequency: number,
-      startTime: number,
-      duration: number,
-      volume: number
-    ) => {
-      const oscillator =
-        context.createOscillator();
-
-      const gain =
-        context.createGain();
-
-      oscillator.type = 'sine';
-
-      oscillator.frequency.setValueAtTime(
-        frequency,
-        now + startTime
-      );
-
-      gain.gain.setValueAtTime(
-        0.001,
-        now + startTime
-      );
-
-      gain.gain.exponentialRampToValueAtTime(
-        volume,
-        now + startTime + 0.02
-      );
-
-      gain.gain.exponentialRampToValueAtTime(
-        0.001,
-        now + startTime + duration
-      );
-
-      oscillator.connect(gain);
-      gain.connect(context.destination);
-
-      oscillator.start(
-        now + startTime
-      );
-
-      oscillator.stop(
-        now + startTime + duration
-      );
-    };
-
-    // Cheerful "Ta-Da!" style melody
-    playNote(659.25, 0.00, 0.14, 0.14); // E5
-    playNote(783.99, 0.10, 0.14, 0.15); // G5
-    playNote(987.77, 0.20, 0.16, 0.16); // B5
-    playNote(1046.50, 0.32, 0.20, 0.18); // C6
-
-    // Bright finishing flourish
-    playNote(1318.51, 0.48, 0.22, 0.17); // E6
-    playNote(1567.98, 0.60, 0.32, 0.14); // G6
-
-    // Small sparkle
-    playNote(1975.53, 0.72, 0.18, 0.08); // B6
-    playNote(2637.02, 0.78, 0.24, 0.05); // E7
-
-    window.setTimeout(() => {
-      void context.close();
-    }, 1200);
-
-  } catch (error) {
-    console.error(
-      'Failed to play celebration sound:',
-      error
-    );
-
-    void context.close();
-  }
-};
 
 const recordTransfer = async (
   employeeId: string
@@ -820,10 +723,6 @@ const recordTransfer = async (
           motivationalMessages
         )
   );
-
-  if (isSoundOn) {
-    playCelebrationSound();
-  }
 
   if (movedToFirst) {
     window.setTimeout(

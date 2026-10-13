@@ -1,20 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { PartyPopper, Zap } from 'lucide-react';
+import { playTransferShoutout } from '@/utils/transferShoutout';
 
 type TransferCelebrationProps = {
   employeeName: string;
   onComplete: () => void;
+  isSoundOn: boolean
 };
 
 export function TransferCelebration({
   employeeName,
   onComplete,
+  isSoundOn
 }: TransferCelebrationProps) {
-  useEffect(() => {
-    const timer = window.setTimeout(onComplete, 2200);
+  
+const shoutoutPlayed = useRef(false);
 
-    return () => window.clearTimeout(timer);
-  }, [onComplete]);
+useEffect(() => {
+  const timer = window.setTimeout(onComplete, 6000);
+
+  if (isSoundOn && !shoutoutPlayed.current) {
+    shoutoutPlayed.current = true;
+    playTransferShoutout(employeeName);
+  }
+
+  return () => window.clearTimeout(timer);
+}, [onComplete, employeeName, isSoundOn]);
+
 
   return (
     <div className="transfer-celebration">

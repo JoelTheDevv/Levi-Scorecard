@@ -38,7 +38,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/login"
+                                "/api/auth/login",
+                                "/api/auth/changepass"
                         ).permitAll()
 
                         .requestMatchers("/api/day/reset").permitAll()

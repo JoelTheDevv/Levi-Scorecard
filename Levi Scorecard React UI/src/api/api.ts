@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "/api";
 
 export async function getTeams() {
   const response = await fetch(
@@ -11,6 +11,24 @@ export async function getTeams() {
 
   return response.json();
 }
+
+export async function deleteEmployee(employeeId: number) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(
+    `${API_BASE_URL}/employees/${employeeId}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete employee");
+  }
+}   
 
 export async function getEmployees() {
   const response = await fetch(
@@ -271,4 +289,35 @@ export async function resumeDay() {
   }
 
   return response.json();
+}
+
+export async function changePassword(
+  loginIdentifier: string,
+  currentPassword: string,
+  newPassword: string,
+  secretCode: string
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/auth/changepass`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        loginIdentifier,
+        currentPassword,
+        newPassword,
+        secretCode,
+      }),
+    }
+  );
+
+  const message = await response.text();
+
+  if (!response.ok || message !== "Password changed successfully") {
+    throw new Error(message || "Password change failed");
+  }
+
+  return message;
 }

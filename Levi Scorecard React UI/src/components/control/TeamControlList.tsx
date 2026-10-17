@@ -2,6 +2,7 @@ import { Zap } from 'lucide-react';
 import type { Team, Employee } from '@/types';
 import { getTeamScore } from '@/utils/scoreboardUtils';
 import { EmployeeControlRow } from '@/components/control/EmployeeControlRow';
+import { deleteEmployee } from '@/api/api';
 
 type TeamControlListProps = {
   teams: Team[];
@@ -12,6 +13,7 @@ type TeamControlListProps = {
   onRecordTransfer: (employeeId: string) => void;
   onReassignEmployee: (employeeId: string, teamId: string) => void;
   onUndoTransfer: (employeeId: string) => void;
+  onDeleteEmployee: (employeeId: string) => void;
 };
 
 export function TeamControlList({
@@ -23,6 +25,7 @@ export function TeamControlList({
   onRecordTransfer,
   onReassignEmployee,
   onUndoTransfer,
+  onDeleteEmployee
 }: TeamControlListProps) {
   return (
     <div className="controller-list panel-card">
@@ -61,6 +64,7 @@ export function TeamControlList({
                   onRecordTransfer={onRecordTransfer}
                   onReassignEmployee={onReassignEmployee}
                   onUndoTransfer={onUndoTransfer}
+                  onDeleteEmployee={onDeleteEmployee}
                 />
               ))}
           </div>

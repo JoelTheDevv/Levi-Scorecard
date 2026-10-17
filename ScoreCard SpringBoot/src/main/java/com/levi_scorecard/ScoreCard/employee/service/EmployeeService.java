@@ -5,8 +5,10 @@ import com.levi_scorecard.ScoreCard.employee.repository.EmployeeRepository;
 import com.levi_scorecard.ScoreCard.team.entity.Team;
 import com.levi_scorecard.ScoreCard.team.repository.TeamRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class EmployeeService {
@@ -23,7 +25,7 @@ public class EmployeeService {
     }
 
     public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+        return employeeRepository.findByDeletedFalse();
     }
 
     public Employee createEmployee(String name, Long teamId) {
@@ -45,5 +47,14 @@ public class EmployeeService {
         employee.setTeam(team);
 
         return employeeRepository.save(employee);
+    }
+
+    @Transactional
+    public boolean deleteEmployee(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NoSuchElementException("Employee not found with ID: " + employeeId));
+        employee.setDeleted(true);
+        employeeRepository.save(employee);
+        return true;
     }
 }

@@ -18,6 +18,9 @@ public class Employee {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
+    @Column(nullable = false, length = 150)
+    private boolean deleted = false;
+
     public Employee() {
     }
 
@@ -45,4 +48,8 @@ public class Employee {
     public void setTeam(Team team) {
         this.team = team;
     }
+
+    public void setDeleted(boolean deleted) {this.deleted = deleted;}
+
+    public boolean isDeleted() {return deleted;}
 }

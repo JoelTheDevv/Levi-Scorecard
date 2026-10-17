@@ -27,6 +27,7 @@ import {
   reassignEmployee as reassignEmployeeApi,
   getDayResult,
   resumeDay as resumeDayApi,
+  deleteEmployee as deleteEmployeeApi
 } from '@/api/api';
 
 import {
@@ -1067,6 +1068,26 @@ const handleRecordTransferUndo = async (
     }
   };
 
+  const deleteEmployee = async (employeeId: string) => {
+  const employee = employees.find(
+    (item) => item.id === employeeId
+  );
+
+  if (!employee) return;
+
+  try {
+    await deleteEmployeeApi(Number(employeeId));
+
+    await loadScoreboard();
+
+    setAnnouncement(`${employee.name} was deleted.`);
+  } catch (error) {
+    console.error("Failed to delete employee:", error);
+
+    setAnnouncement("Failed to delete employee.");
+  }
+};
+
   return {
     employees,
     teams,
@@ -1102,5 +1123,6 @@ const handleRecordTransferUndo = async (
     currentBusinessDate,
     canResumeDay,
     resumeDay,
+    deleteEmployee
   };
 }

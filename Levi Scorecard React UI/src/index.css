@@ -1250,3 +1250,75 @@ button { cursor: pointer; }
     overflow-wrap: anywhere;
   }
 }
+
+.delete-employee {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.delete-employee:hover {
+  color: #991b1b;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.delete-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.delete-modal h3 {
+  margin-top: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-delete {
+  background: #dc2626;
+  color: white;
+}
+
+.confirm-delete:hover {
+  background: #b91c1c;
+}
+
+.change-password-form {
+  margin-top: 20px;
+}
+
+.change-password-form h3 {
+  margin-bottom: 12px;
+}
+
+.login-success {
+  color: #16804a;
+  font-size: 12px;
+  margin-top: 12px;
+}

@@ -98,6 +98,7 @@ export function ControlCenterPage() {
               onRecordTransfer={handleRecordTransfer}
               onReassignEmployee={handleReassignEmployee}
               onUndoTransfer={scoreboard.undoTransfer}
+              onDeleteEmployee={scoreboard.deleteEmployee}
             />
           </div>
 

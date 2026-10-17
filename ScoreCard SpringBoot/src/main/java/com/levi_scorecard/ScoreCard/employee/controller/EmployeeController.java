@@ -39,4 +39,9 @@ public class EmployeeController {
     ) {
         return employeeService.changeTeam(employeeId, teamId);
     }
+
+    @PostMapping("/{employeeId}")
+    public boolean deleteEmployee(@PathVariable Long employeeId) {
+        return employeeService.deleteEmployee(employeeId);
+    }
 }

@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { LockKeyhole, LogIn, ShieldCheck, KeyRound } from 'lucide-react';import { useNavigate } from 'react-router-dom';
 import { useScoreboard } from '@/hooks/useScoreboard';
 
 import { WhiteLogo } from '@/components/common/WhiteLogo';
 import { Logo } from '@/components/common/Logo';
 
-import { login } from '@/api/api';
+import { changePassword, login } from '@/api/api';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -16,6 +15,13 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [secretCode, setSecretCode] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const handleLogin = async () => {
     setError('');
@@ -45,6 +51,39 @@ export function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  const handleChangePassword = async () => {
+  setPasswordMessage('');
+  setPasswordError('');
+
+  if (!email.trim() || !currentPassword || !newPassword || !secretCode) {
+    setPasswordError('Please fill in all fields.');
+    return;
+  }
+
+  try {
+    setIsLoading(true);
+
+    const message = await changePassword(
+      email.trim(),
+      currentPassword,
+      newPassword,
+      secretCode
+    );
+
+    setPasswordMessage(message);
+    setPassword('');
+    setCurrentPassword('');
+    setNewPassword('');
+    setSecretCode('');
+  } catch (error) {
+    setPasswordError(
+      error instanceof Error ? error.message : 'Password change failed.'
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="login-screen">
@@ -147,6 +186,68 @@ export function LoginPage() {
               ? 'Signing in...'
               : 'Enter control center'}
           </button>
+
+          <button
+  type="button"
+  className="back-button"
+  onClick={() => {
+    setShowChangePassword(!showChangePassword);
+    setPasswordError('');
+    setPasswordMessage('');
+  }}
+>
+  {showChangePassword ? 'Back to login' : 'Change password'}
+</button>
+
+{showChangePassword && (
+  <div className="change-password-form">
+    <h3>Change Password</h3>
+
+    <label>
+      Current Password
+      <input
+        type="password"
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+      />
+    </label>
+
+    <label>
+      New Password
+      <input
+        type="password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
+    </label>
+
+    <label>
+      Secret Code
+      <input
+        type="password"
+        value={secretCode}
+        onChange={(e) => setSecretCode(e.target.value)}
+      />
+    </label>
+
+    {passwordError && (
+      <div className="login-error">{passwordError}</div>
+    )}
+
+    {passwordMessage && (
+      <div className="login-success">{passwordMessage}</div>
+    )}
+
+    <button
+      className="primary-button full-button"
+      onClick={handleChangePassword}
+      disabled={isLoading}
+    >
+      <KeyRound size={16} />
+      {isLoading ? 'Changing...' : 'Update Password'}
+    </button>
+  </div>
+)}
 
         </div>
       </div>

@@ -1,6 +1,9 @@
 import { Plus, Undo2 } from 'lucide-react';
 import type { Employee, Team } from '@/types';
 import { getInitials } from '@/utils/scoreboardUtils';
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+
 
 type EmployeeControlRowProps = {
   employee: Employee;
@@ -11,6 +14,7 @@ type EmployeeControlRowProps = {
   onRecordTransfer: (employeeId: string) => void;
   onReassignEmployee: (employeeId: string, teamId: string) => void;
   onUndoTransfer: (employeeId: string) => void;
+  onDeleteEmployee: (employeeId: string) => void;
 };
 
 export function EmployeeControlRow({
@@ -21,8 +25,20 @@ export function EmployeeControlRow({
   dayEnded,
   onRecordTransfer,
   onReassignEmployee,
-  onUndoTransfer
+  onUndoTransfer,
+  onDeleteEmployee
 }: EmployeeControlRowProps) {
+
+const [employeeToDelete, setEmployeeToDelete] =
+  useState<Employee | null>(null);  
+
+  const handleDeleteEmployee = async () => {
+  if (!employeeToDelete) return;
+
+  await onDeleteEmployee(employeeToDelete.id);
+  setEmployeeToDelete(null);
+};
+
   return (
     <div className={`control-employee ${flash ? 'flash-row' : ''}`}>
       <div className="mini-avatar">{getInitials(employee.name)}</div>
@@ -67,6 +83,44 @@ export function EmployeeControlRow({
       >
         <Undo2 size={18} />
       </button>
+
+      <button
+        className="delete-employee"
+        onClick={() => setEmployeeToDelete(employee)}
+        aria-label={`Delete employee ${employee.name}`}
+      >
+        <Trash2 size={18} />
+      </button>
+
+      {employeeToDelete && (
+  <div className="modal-overlay">
+    <div
+      className="delete-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-modal-title"
+    >
+      <h3 id="delete-modal-title">Confirm Deletion</h3>
+
+      <p>
+        Are you sure you want to delete {employee.name}
+      </p>
+
+      <div className="modal-actions">
+        <button onClick={() => setEmployeeToDelete(null)}>
+          No
+        </button>
+
+        <button
+          className="confirm-delete"
+          onClick={handleDeleteEmployee}
+        >
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
   );
